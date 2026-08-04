@@ -1,0 +1,16 @@
+# Maven build output
+target/
+
+# Compiled class files
+*.class
+
+# H2 database files (local data, not source code)
+data/
+
+# IDE settings
+.idea/
+*.iml
+.vscode/
+
+# OS files
+.DS_Store
