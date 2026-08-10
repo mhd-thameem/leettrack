@@ -4,6 +4,7 @@ import com.thameem.leettrack.model.Problem;
 import com.thameem.leettrack.repository.ProblemRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import com.thameem.leettrack.exception.ProblemNotFoundException;
 
 import java.util.List;
 
@@ -24,9 +25,9 @@ public class ProblemService {
     }
 
     public Problem getProblemById(Long id) {
-        return problemRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Problem not found with id: " + id));
-    }
+    return problemRepository.findById(id)
+            .orElseThrow(() -> new ProblemNotFoundException(id));
+}
 
     public Problem createProblem(Problem problem) {
         return problemRepository.save(problem);
