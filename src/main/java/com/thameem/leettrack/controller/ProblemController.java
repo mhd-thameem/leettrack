@@ -23,6 +23,11 @@ public class ProblemController {
         return problemService.getAllProblems();
     }
 
+    @GetMapping("/stats")
+    public java.util.Map<String, Object> getStats() {
+    return problemService.getStats();
+    }
+
     @GetMapping("/{id}")
     public Problem getProblemById(@PathVariable Long id) {
         return problemService.getProblemById(id);
