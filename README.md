@@ -3,4 +3,4 @@
 A Spring Boot REST API for tracking LeetCode problem-solving progress.
 
 ## Status
-In development.
+MVP done — CRUD, error handling, and stats endpoint live.
