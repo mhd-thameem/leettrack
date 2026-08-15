@@ -73,7 +73,17 @@ public class ProblemService {
         existing.setStatus(updatedProblem.getStatus());
         return problemRepository.save(existing);
     }
+    public List<Problem> getProblemsByDifficulty(Difficulty difficulty) {
+        return problemRepository.findByDifficulty(difficulty);
+    }
 
+    public List<Problem> getProblemsByStatus(Status status) {
+        return problemRepository.findByStatus(status);
+    }
+
+    public List<Problem> getProblemsByPattern(String pattern) {
+        return problemRepository.findByPattern(pattern);
+    }
     public void deleteProblem(Long id) {
         problemRepository.deleteById(id);
     }
