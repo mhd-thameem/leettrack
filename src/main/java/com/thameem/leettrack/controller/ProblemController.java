@@ -1,5 +1,7 @@
 package com.thameem.leettrack.controller;
 
+import com.thameem.leettrack.model.Difficulty;
+import com.thameem.leettrack.model.Status;
 import com.thameem.leettrack.model.Problem;
 import com.thameem.leettrack.service.ProblemService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,8 +21,21 @@ public class ProblemController {
     }
 
     @GetMapping
-    public List<Problem> getAllProblems() {
-        return problemService.getAllProblems();
+public List<Problem> getAllProblems(
+        @RequestParam(required = false) Difficulty difficulty,
+        @RequestParam(required = false) Status status,
+        @RequestParam(required = false) String pattern) {
+
+    if (difficulty != null) {
+        return problemService.getProblemsByDifficulty(difficulty);
+    }
+    if (status != null) {
+        return problemService.getProblemsByStatus(status);
+    }
+    if (pattern != null) {
+        return problemService.getProblemsByPattern(pattern);
+    }
+    return problemService.getAllProblems();
     }
 
     @GetMapping("/stats")
