@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>LeetTrack</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 700px; margin: 40px auto; padding: 0 20px; }
+        input, select, button { padding: 8px; margin: 4px 0; }
+        #problemList { margin-top: 20px; }
+        .problem { border: 1px solid #ccc; padding: 10px; margin-bottom: 8px; border-radius: 4px; }
+        #authSection, #appSection { margin-bottom: 20px; }
+        #appSection { display: none; }
+        .error { color: red; }
+    </style>
+</head>
+<body>
+
+    <h1>LeetTrack</h1>
+
+    <div id="authSection">
+        <h2>Login / Register</h2>
+        <input type="text" id="username" placeholder="Username"><br>
+        <input type="password" id="password" placeholder="Password"><br>
+        <button onclick="register()">Register</button>
+        <button onclick="login()">Login</button>
+        <p id="authError" class="error"></p>
+    </div>
+
+    <div id="appSection">
+        <h2>Your Problems</h2>
+        <button onclick="logout()">Logout</button>
+
+        <h3>Filter</h3>
+        <select id="difficultyFilter" onchange="loadProblems()">
+            <option value="">All Difficulties</option>
+            <option value="EASY">Easy</option>
+            <option value="MEDIUM">Medium</option>
+            <option value="HARD">Hard</option>
+        </select>
+
+        <div id="problemList"></div>
+    </div>
+
+    <script>
+        const API_BASE = "http://localhost:8080";
+        let token = null;
+
+        async function register() {
+            const username = document.getElementById("username").value;
+            const password = document.getElementById("password").value;
+
+            const response = await fetch(`${API_BASE}/api/auth/register`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ username, password })
+            });
+
+            if (response.ok) {
+                document.getElementById("authError").innerText = "Registered! Now click Login.";
+            } else {
+                document.getElementById("authError").innerText = "Registration failed.";
+            }
+        }
+
+        async function login() {
+            const username = document.getElementById("username").value;
+            const password = document.getElementById("password").value;
+
+            const response = await fetch(`${API_BASE}/api/auth/login`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ username, password })
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                token = data.token;
+                document.getElementById("authSection").style.display = "none";
+                document.getElementById("appSection").style.display = "block";
+                loadProblems();
+            } else {
+                document.getElementById("authError").innerText = "Login failed. Check username/password.";
+            }
+        }
+
+        function logout() {
+            token = null;
+            document.getElementById("authSection").style.display = "block";
+            document.getElementById("appSection").style.display = "none";
+        }
+
+        async function loadProblems() {
+            const difficulty = document.getElementById("difficultyFilter").value;
+            let url = `${API_BASE}/api/problems`;
+            if (difficulty) {
+                url += `?difficulty=${difficulty}`;
+            }
+
+            const response = await fetch(url, {
+                headers: { "Authorization": `Bearer ${token}` }
+            });
+
+            const problems = await response.json();
+            const listDiv = document.getElementById("problemList");
+            listDiv.innerHTML = "";
+
+            problems.forEach(p => {
+                const div = document.createElement("div");
+                div.className = "problem";
+                div.innerHTML = `<strong>${p.title}</strong> — ${p.difficulty} — ${p.pattern} — ${p.status}`;
+                listDiv.appendChild(div);
+            });
+        }
+    </script>
+
+</body>
+</html>
