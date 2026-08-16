@@ -1,8 +1,8 @@
 package com.thameem.leettrack.security;
 
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.security.Key;
@@ -11,24 +11,27 @@ import java.util.Date;
 @Component
 public class JwtUtil {
 
-    // In a real production app, this key would come from a secure config, not hardcoded.
-    // For learning purposes, this is fine.
-    private final Key key = Keys.secretKeyFor(SignatureAlgorithm.HS256);
+    @Value("${JWT_SECRET}")
+    private String jwtSecret;
 
-    private static final long EXPIRATION_TIME = 1000 * 60 * 60 * 10; // 10 hours, in milliseconds
+    private static final long EXPIRATION_TIME = 1000 * 60 * 60 * 10; // 10 hours
+
+    private Key getKey() {
+        return Keys.hmacShaKeyFor(jwtSecret.getBytes());
+    }
 
     public String generateToken(String username) {
         return Jwts.builder()
                 .setSubject(username)
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME))
-                .signWith(key)
+                .signWith(getKey())
                 .compact();
     }
 
     public String extractUsername(String token) {
         return Jwts.parserBuilder()
-                .setSigningKey(key)
+                .setSigningKey(getKey())
                 .build()
                 .parseClaimsJws(token)
                 .getBody()
@@ -37,7 +40,7 @@ public class JwtUtil {
 
     public boolean isTokenValid(String token) {
         try {
-            Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token);
+            Jwts.parserBuilder().setSigningKey(getKey()).build().parseClaimsJws(token);
             return true;
         } catch (Exception e) {
             return false;
